@@ -7,21 +7,27 @@
 # you're doing.
 Vagrant.configure("2") do |config|
 	config.vm.provider "virtualbox"
-	config.vm.box = "testdc01"
+	config.vm.box = "mikensec/WinServer2019"
+    config.vm.box_version = "1.0.0"
 	config.vm.guest = :windows 
 	config.vm.communicator = "winrm"
 	config.vm.hostname = "DC01"
 	config.vm.base_mac = "0800279013FA"
-	config.vm.boot_timeout = 600 
-	config.vm.graceful_halt_timeout = 600
+	config.vm.boot_timeout = 6000 
+	config.vm.graceful_halt_timeout = 6000
 	config.vm.network :forwarded_port, guest: 3389, host: 3389 
 	config.vm.network :forwarded_port, guest: 5985, host: 5985, id: "winrm", auto_correct: true
 	 
 	#	 
 	
-	config.vm.provision :shell, :path => "https://raw.githubusercontent.com/mikensec/ADGenerator/main/Invoke-ForestDeploy.ps1"
-	config.vm.provision :shell, :path => "https://raw.githubusercontent.com/mikensec/ADGenerator/main/ADGenerator.ps1"
-    
+	#config.vm.provision :reload
+	 
+	config.vm.provision :shell do |shell|
+		shell.privileged = true
+		shell.path = "https://raw.githubusercontent.com/mikensec/ADGenerator/main/Invoke-ForestDeploy.ps1"
+		shell.reboot = true
+	end
+	    
 	
 	# Network Settings for guest system
 	config.vm.network "private_network", ip: "192.168.3.8",
@@ -33,8 +39,8 @@ Vagrant.configure("2") do |config|
 		
 	config.vm.provider "virtualbox" do |v|
 		v.gui = true
-		v.name = "DC01vagrant"
-		v.memory = 2048
+		v.name = "DC01"
+		v.memory = 4048
 		v.cpus = 2
 		
 		#Set up networks on VirtualBox
